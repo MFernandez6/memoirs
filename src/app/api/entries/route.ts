@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Entry {
@@ -8,10 +8,27 @@ interface Entry {
   timestamp: number;
 }
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
 export async function GET() {
   try {
-    const entries = await kv.get<Entry[]>("memoir-entries");
-    return NextResponse.json(entries || []);
+    const { data, error } = await supabase
+      .from("entries")
+      .select("*")
+      .order("timestamp", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching entries:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch entries" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(data || []);
   } catch (error) {
     console.error("Error fetching entries:", error);
     return NextResponse.json(
@@ -40,16 +57,21 @@ export async function POST(request: NextRequest) {
       timestamp: Date.now(),
     };
 
-    // Get existing entries
-    const existingEntries = (await kv.get<Entry[]>("memoir-entries")) || [];
+    const { data, error } = await supabase
+      .from("entries")
+      .insert([newEntry])
+      .select()
+      .single();
 
-    // Add new entry to the beginning
-    const updatedEntries = [newEntry, ...existingEntries];
+    if (error) {
+      console.error("Error saving entry:", error);
+      return NextResponse.json(
+        { error: "Failed to save entry" },
+        { status: 500 }
+      );
+    }
 
-    // Save back to database
-    await kv.set("memoir-entries", updatedEntries);
-
-    return NextResponse.json(newEntry);
+    return NextResponse.json(data);
   } catch (error) {
     console.error("Error saving entry:", error);
     return NextResponse.json(
@@ -71,16 +93,15 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Get existing entries
-    const existingEntries = (await kv.get<Entry[]>("memoir-entries")) || [];
+    const { error } = await supabase.from("entries").delete().eq("id", id);
 
-    // Remove the entry with the specified ID
-    const updatedEntries = existingEntries.filter(
-      (entry: Entry) => entry.id !== id
-    );
-
-    // Save back to database
-    await kv.set("memoir-entries", updatedEntries);
+    if (error) {
+      console.error("Error deleting entry:", error);
+      return NextResponse.json(
+        { error: "Failed to delete entry" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
