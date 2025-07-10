@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "src/app/api/entries/route.ts": {
+      "maxDuration": 10
+    }
+  }
+}

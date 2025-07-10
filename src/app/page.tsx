@@ -21,62 +21,68 @@ export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [password, setPassword] = useState("");
 
-  // Load entries from localStorage on component mount
+  // Load entries from API on component mount
   useEffect(() => {
-    const savedEntries = localStorage.getItem("memoir-entries");
-    if (savedEntries) {
+    const fetchEntries = async () => {
       try {
-        const parsedEntries = JSON.parse(savedEntries);
-
-        // Handle migration from old string format to new Entry format
-        const migratedEntries = parsedEntries.map(
-          (entry: string | Partial<Entry>, index: number) => {
-            if (typeof entry === "string") {
-              // Old format - convert to new Entry format
-              return {
-                id: `migrated-${Date.now()}-${index}`,
-                title: `Entry ${parsedEntries.length - index}`,
-                content: entry,
-                timestamp:
-                  Date.now() - (parsedEntries.length - index) * 86400000, // Approximate dates
-              };
-            }
-            // New format - ensure it has all required fields
-            return {
-              id: entry.id || `entry-${Date.now()}-${index}`,
-              title: entry.title || "Untitled",
-              content: entry.content || String(entry),
-              timestamp: entry.timestamp || Date.now(),
-            };
-          }
-        );
-
-        setEntries(migratedEntries);
+        const response = await fetch("/api/entries");
+        if (response.ok) {
+          const data = await response.json();
+          setEntries(data);
+        } else {
+          console.error("Failed to fetch entries");
+        }
       } catch (error) {
-        console.error("Error loading entries from localStorage:", error);
+        console.error("Error loading entries:", error);
       }
-    }
+    };
+
+    fetchEntries();
     setMounted(true);
   }, []);
 
-  // Save entries to localStorage whenever entries change
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem("memoir-entries", JSON.stringify(entries));
-    }
-  }, [entries, mounted]);
-
-  const handleAddEntry = () => {
+  const handleAddEntry = async () => {
     if (entryContent.trim() && entryTitle.trim()) {
-      const newEntry: Entry = {
-        id: Date.now().toString(),
-        title: entryTitle.trim(),
-        content: entryContent.trim(),
-        timestamp: Date.now(),
-      };
-      setEntries([newEntry, ...entries]);
-      setEntryTitle("");
-      setEntryContent("");
+      try {
+        const response = await fetch("/api/entries", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: entryTitle.trim(),
+            content: entryContent.trim(),
+          }),
+        });
+
+        if (response.ok) {
+          const newEntry = await response.json();
+          setEntries([newEntry, ...entries]);
+          setEntryTitle("");
+          setEntryContent("");
+        } else {
+          console.error("Failed to save entry");
+        }
+      } catch (error) {
+        console.error("Error saving entry:", error);
+      }
+    }
+  };
+
+  const handleDeleteEntry = async (id: string) => {
+    try {
+      const response = await fetch(`/api/entries?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const newEntries = entries.filter((entry) => entry.id !== id);
+        setEntries(newEntries);
+      } else {
+        console.error("Failed to delete entry");
+      }
+    } catch (error) {
+      console.error("Error deleting entry:", error);
     }
   };
 
@@ -84,11 +90,6 @@ export default function Home() {
     if (e.key === "Enter" && e.metaKey) {
       handleAddEntry();
     }
-  };
-
-  const handleDeleteEntry = (id: string) => {
-    const newEntries = entries.filter((entry) => entry.id !== id);
-    setEntries(newEntries);
   };
 
   const handleLogin = () => {
