@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { X, Upload, Image as ImageIcon } from "lucide-react";
+import { useState, useCallback } from "react";
+import { useDropzone } from "react-dropzone";
+import { X, Upload } from "lucide-react";
 
 interface ImageUploadProps {
-  onImageUpload: (url: string) => void;
+  onImageUpload: (imageUrl: string) => void;
   currentImage?: string;
   onRemoveImage: () => void;
 }
@@ -14,61 +15,67 @@ export default function ImageUpload({
   currentImage,
   onRemoveImage,
 }: ImageUploadProps) {
+  const [displayImage, setDisplayImage] = useState<string>(currentImage || "");
   const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (acceptedFiles.length === 0) return;
+
+      const file = acceptedFiles[0];
+      setIsUploading(true);
+
       try {
-        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
 
-        // Create a preview URL
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const result = e.target?.result as string;
-            setPreviewUrl(result);
-            onImageUpload(result);
-            setIsUploading(false);
-          } catch (error) {
-            console.error("Error processing image:", error);
-            setIsUploading(false);
-          }
-        };
-        reader.onerror = (error) => {
-          console.error("Error reading file:", error);
-          setIsUploading(false);
-        };
-        reader.readAsDataURL(file);
+        const response = await fetch("/api/uploadthing", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const imageUrl = data.url;
+          setDisplayImage(imageUrl);
+          onImageUpload(imageUrl);
+        } else {
+          console.error("Upload failed");
+          alert("Failed to upload image. Please try again.");
+        }
       } catch (error) {
-        console.error("Error handling file selection:", error);
+        console.error("Upload error:", error);
+        alert("Failed to upload image. Please try again.");
+      } finally {
         setIsUploading(false);
       }
-    }
-  };
+    },
+    [onImageUpload]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp"],
+    },
+    multiple: false,
+  });
 
   const handleRemoveImage = () => {
-    setPreviewUrl("");
+    setDisplayImage("");
     onRemoveImage();
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   };
-
-  const displayImage = currentImage || previewUrl;
 
   return (
     <div className="space-y-4">
-      <label className="text-sm font-medium text-[#765555] dark:text-[#ae866c] mb-2 block">
-        Story Image (Optional)
+      <label className="text-sm font-medium text-[#948363] mb-2 block">
+        Image (Optional)
       </label>
 
       {displayImage ? (
         <div className="mb-4 flex justify-center">
-          <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#ae866c]/30 dark:border-[#765555]/30 shadow-lg group max-w-md">
-            <div className="transition-all duration-500 ease-in-out rotated-image-container">
+          <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-md">
+            <div className="transition-all duration-500 ease-in-out">
               <img
                 src={displayImage}
                 alt="Story image"
@@ -79,7 +86,7 @@ export default function ImageUpload({
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
               <button
                 onClick={handleRemoveImage}
-                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg backdrop-blur-sm"
+                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#948363]/80 hover:bg-[#948363] text-white p-2 rounded-full shadow-lg"
                 title="Remove image"
               >
                 <X className="w-4 h-4" />
@@ -89,43 +96,34 @@ export default function ImageUpload({
         </div>
       ) : (
         <div
-          className={`
-            border-2 border-dashed border-[#ae866c]/30 dark:border-[#765555]/30
-            rounded-lg p-6 text-center transition-all duration-300
-            hover:border-[#765555] dark:hover:border-[#ae866c]
-            bg-white/50 dark:bg-[#543f3f]/50 backdrop-blur-sm
-            ${
-              isUploading
-                ? "opacity-50"
-                : "hover:bg-white/70 dark:hover:bg-[#543f3f]/70"
-            }
-            cursor-pointer
-          `}
-          onClick={() => fileInputRef.current?.click()}
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-300 ${
+            isDragActive
+              ? "border-[#a39170] bg-[#a39170]/10"
+              : "border-[#c9c1a7] hover:border-[#a39170] hover:bg-[#a39170]/5"
+          }`}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#765555] to-[#ae866c] rounded-full flex items-center justify-center">
-              <ImageIcon className="w-6 h-6 text-white" />
+          <input {...getInputProps()} />
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 bg-[#948363]/10 rounded-full flex items-center justify-center">
+              <Upload className="w-6 h-6 text-[#948363]" />
             </div>
             <div>
-              <p className="text-[#543f3f] dark:text-[#ead8c2] font-medium">
-                Drop your image here
+              <p className="text-[#948363] font-medium mb-1">
+                {isDragActive
+                  ? "Drop your image here"
+                  : "Drag & drop an image here"}
               </p>
-              <p className="text-[#765555]/60 dark:text-[#ae866c]/60 text-sm">
-                or click to browse
+              <p className="text-[#948363]/60 text-sm">
+                or click to browse files
               </p>
             </div>
-            <div className="flex items-center gap-2 bg-[#765555] hover:bg-[#543f3f] dark:bg-[#ae866c] dark:hover:bg-[#765555] text-white px-4 py-2 rounded-md transition-colors duration-300">
-              <Upload className="w-4 h-4" />
-              <span>Choose Image</span>
-            </div>
+            {isUploading && (
+              <div className="flex items-center gap-2 text-[#948363]">
+                <div className="w-4 h-4 border-2 border-[#948363] border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-sm">Uploading...</span>
+              </div>
+            )}
           </div>
         </div>
       )}
