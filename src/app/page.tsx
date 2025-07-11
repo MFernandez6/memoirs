@@ -4,17 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import ImageUpload from "@/components/ImageUpload";
+import { RotateCw } from "lucide-react";
 
 interface Entry {
   id: string;
   title: string;
   content: string;
+  image_url?: string;
   timestamp: number;
+  image_rotation?: number; // Added image_rotation to the interface
 }
 
 export default function Home() {
   const [entryTitle, setEntryTitle] = useState("");
   const [entryContent, setEntryContent] = useState("");
+  const [entryImage, setEntryImage] = useState<string>("");
   const [entries, setEntries] = useState<Entry[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isAuthor, setIsAuthor] = useState(false);
@@ -25,12 +30,15 @@ export default function Home() {
   useEffect(() => {
     const fetchEntries = async () => {
       try {
+        console.log("Fetching entries...");
         const response = await fetch("/api/entries");
+        console.log("Response status:", response.status);
         if (response.ok) {
           const data = await response.json();
+          console.log("Entries loaded:", data);
           setEntries(data);
         } else {
-          console.error("Failed to fetch entries");
+          console.error("Failed to fetch entries:", response.status);
         }
       } catch (error) {
         console.error("Error loading entries:", error);
@@ -52,6 +60,7 @@ export default function Home() {
           body: JSON.stringify({
             title: entryTitle.trim(),
             content: entryContent.trim(),
+            image_url: entryImage || null,
           }),
         });
 
@@ -60,6 +69,7 @@ export default function Home() {
           setEntries([newEntry, ...entries]);
           setEntryTitle("");
           setEntryContent("");
+          setEntryImage("");
         } else {
           console.error("Failed to save entry");
         }
@@ -113,6 +123,31 @@ export default function Home() {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const handleRotateImage = async (id: string) => {
+    const entryToRotate = entries.find((entry) => entry.id === id);
+    if (entryToRotate && entryToRotate.image_url) {
+      try {
+        const response = await fetch(`/api/entries/rotate-image?id=${id}`, {
+          method: "POST",
+        });
+
+        if (response.ok) {
+          const updatedEntry = await response.json();
+          setEntries(
+            entries.map((entry) => (entry.id === id ? updatedEntry : entry))
+          );
+          alert("Image rotated successfully!");
+        } else {
+          console.error("Failed to rotate image");
+          alert("Failed to rotate image. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error rotating image:", error);
+        alert("Failed to rotate image. Please try again.");
+      }
+    }
   };
 
   return (
@@ -227,6 +262,12 @@ export default function Home() {
                       className="min-h-[200px] border-2 border-[#e3ddc5] focus:border-[#ae866c] dark:border-[#765555] dark:focus:border-[#ead8c2] bg-transparent text-[#543f3f] dark:text-[#ead8c2] placeholder-[#765555]/50 dark:placeholder-[#ae866c]/50 resize-none text-lg leading-relaxed"
                     />
                   </div>
+
+                  <ImageUpload
+                    onImageUpload={setEntryImage}
+                    currentImage={entryImage}
+                    onRemoveImage={() => setEntryImage("")}
+                  />
                   <Button
                     onClick={handleAddEntry}
                     disabled={!entryContent.trim() || !entryTitle.trim()}
@@ -292,6 +333,43 @@ export default function Home() {
                               {formatDate(entry.timestamp)}
                             </p>
                           </div>
+
+                          {entry.image_url && (
+                            <div className="mb-4 flex justify-center">
+                              <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#ae866c]/30 dark:border-[#765555]/30 shadow-lg group max-w-md">
+                                <div
+                                  className="rotated-image-container transition-all duration-500 ease-in-out"
+                                  style={{
+                                    transform: entry.image_rotation
+                                      ? `rotate(${entry.image_rotation}deg)`
+                                      : "none",
+                                  }}
+                                >
+                                  <img
+                                    src={entry.image_url}
+                                    alt="Story image"
+                                    className="w-full h-full object-contain transition-all duration-500"
+                                    loading="lazy"
+                                    style={{ background: "transparent" }}
+                                  />
+                                </div>
+                                {isAuthor && (
+                                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <button
+                                      onClick={() =>
+                                        handleRotateImage(entry.id)
+                                      }
+                                      className="rotation-button bg-[#765555]/80 hover:bg-[#765555] dark:bg-[#ae866c]/80 dark:hover:bg-[#ae866c] text-white p-2 rounded-full shadow-lg transition-all duration-300"
+                                      title="Rotate image"
+                                    >
+                                      <RotateCw className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
                           <p className="text-[#543f3f] dark:text-[#ead8c2] leading-relaxed whitespace-pre-line text-lg">
                             {entry.content}
                           </p>

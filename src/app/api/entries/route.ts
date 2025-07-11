@@ -5,6 +5,7 @@ interface Entry {
   id: string;
   title: string;
   content: string;
+  image_url?: string;
   timestamp: number;
 }
 
@@ -50,9 +51,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, content } = body;
+    const { title, content, image_url } = body;
 
-    console.log("Saving entry:", { title, content });
+    console.log("Saving entry:", { title, content, image_url });
 
     if (!title || !content) {
       return NextResponse.json(
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
       id: Date.now().toString(),
       title: title.trim(),
       content: content.trim(),
+      image_url: image_url || null,
       timestamp: Date.now(),
     };
 

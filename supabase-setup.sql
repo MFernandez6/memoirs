@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS entries (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
+  image_url TEXT,
   timestamp BIGINT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
