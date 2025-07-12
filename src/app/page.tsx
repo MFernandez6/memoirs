@@ -5,13 +5,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import ImageUpload from "@/components/ImageUpload";
-import { RotateCw } from "lucide-react";
+import { RotateCw, Edit, X, Save } from "lucide-react";
 
 interface Entry {
   id: string;
   title: string;
   content: string;
   image_url?: string;
+  image_url_2?: string;
   timestamp: number;
   image_rotation?: number;
 }
@@ -20,11 +21,17 @@ export default function Home() {
   const [entryTitle, setEntryTitle] = useState("");
   const [entryContent, setEntryContent] = useState("");
   const [entryImage, setEntryImage] = useState<string>("");
+  const [entryImage2, setEntryImage2] = useState<string>("");
   const [entries, setEntries] = useState<Entry[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isAuthor, setIsAuthor] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [password, setPassword] = useState("");
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [editImage, setEditImage] = useState<string>("");
+  const [editImage2, setEditImage2] = useState<string>("");
 
   // Load entries from API on component mount
   useEffect(() => {
@@ -61,6 +68,7 @@ export default function Home() {
             title: entryTitle.trim(),
             content: entryContent.trim(),
             image_url: entryImage || null,
+            image_url_2: entryImage2 || null,
           }),
         });
 
@@ -70,12 +78,47 @@ export default function Home() {
           setEntryTitle("");
           setEntryContent("");
           setEntryImage("");
+          setEntryImage2("");
         } else {
           console.error("Failed to save entry");
         }
       } catch (error) {
         console.error("Error saving entry:", error);
       }
+    }
+  };
+
+  const handleUpdateEntry = async () => {
+    if (!editingEntry || !editContent.trim() || !editTitle.trim()) return;
+
+    try {
+      const response = await fetch("/api/entries", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingEntry.id,
+          title: editTitle.trim(),
+          content: editContent.trim(),
+          image_url: editImage || null,
+          image_url_2: editImage2 || null,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedEntry = await response.json();
+        setEntries(
+          entries.map((entry) =>
+            entry.id === editingEntry.id ? updatedEntry : entry
+          )
+        );
+        handleCancelEdit();
+      } else {
+        console.error("Failed to update entry");
+      }
+    } catch (error) {
+      console.error("Error updating entry:", error);
     }
   };
 
@@ -96,9 +139,61 @@ export default function Home() {
     }
   };
 
+  const handleEditEntry = (entry: Entry) => {
+    setEditingEntry(entry);
+    setEditTitle(entry.title);
+    setEditContent(entry.content);
+    setEditImage(entry.image_url || "");
+    setEditImage2(entry.image_url_2 || "");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEntry(null);
+    setEditTitle("");
+    setEditContent("");
+    setEditImage("");
+    setEditImage2("");
+  };
+
+  const handleImageUpload = (imageUrl: string, imageIndex?: number) => {
+    if (editingEntry) {
+      if (imageIndex === 1) {
+        setEditImage2(imageUrl);
+      } else {
+        setEditImage(imageUrl);
+      }
+    } else {
+      if (imageIndex === 1) {
+        setEntryImage2(imageUrl);
+      } else {
+        setEntryImage(imageUrl);
+      }
+    }
+  };
+
+  const handleRemoveImage = (imageIndex?: number) => {
+    if (editingEntry) {
+      if (imageIndex === 1) {
+        setEditImage2("");
+      } else {
+        setEditImage("");
+      }
+    } else {
+      if (imageIndex === 1) {
+        setEntryImage2("");
+      } else {
+        setEntryImage("");
+      }
+    }
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && e.metaKey) {
-      handleAddEntry();
+      if (editingEntry) {
+        handleUpdateEntry();
+      } else {
+        handleAddEntry();
+      }
     }
   };
 
@@ -149,6 +244,44 @@ export default function Home() {
       }
     }
   };
+
+  const renderImage = (
+    imageUrl: string,
+    entryId: string,
+    isSecondImage = false
+  ) => (
+    <div className="mb-3 sm:mb-4 flex justify-center">
+      <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-full sm:max-w-lg md:max-w-xl">
+        <div
+          className="transition-all duration-500 ease-in-out"
+          style={{
+            transform: isSecondImage ? "none" : "none", // You can add rotation logic for second image if needed
+            maxWidth: "100%",
+            maxHeight: "400px",
+          }}
+        >
+          <img
+            src={imageUrl}
+            alt={`Story image ${isSecondImage ? "2" : "1"}`}
+            className="w-full h-full object-contain transition-all duration-500"
+            loading="lazy"
+            style={{ background: "transparent" }}
+          />
+        </div>
+        {isAuthor && (
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={() => handleRotateImage(entryId)}
+              className="bg-[#948363]/80 hover:bg-[#948363] text-white p-1.5 sm:p-2 rounded-full shadow-lg transition-all duration-300"
+              title="Rotate image"
+            >
+              <RotateCw className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#dfdac4] via-[#c9c1a7] to-[#b0a384] relative">
@@ -283,11 +416,11 @@ export default function Home() {
         </header>
 
         {/* Main Content Grid - Responsive layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 xl:gap-12 max-w-8xl mx-auto">
           {/* Writing Section - Only visible to author */}
           {isAuthor && (
             <div
-              className={`transition-all duration-1000 delay-200 order-2 lg:order-1 ${
+              className={`transition-all duration-1000 delay-200 order-2 xl:order-1 ${
                 mounted
                   ? "opacity-100 translate-x-0"
                   : "opacity-0 -translate-x-8"
@@ -298,8 +431,19 @@ export default function Home() {
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-[#a39170] rounded-full"></div>
                     <CardTitle className="text-xl sm:text-2xl font-bold text-[#2d1f0f]">
-                      New Entry
+                      {editingEntry ? "Edit Story" : "New Entry"}
                     </CardTitle>
+                    {editingEntry && (
+                      <Button
+                        onClick={handleCancelEdit}
+                        variant="outline"
+                        size="sm"
+                        className="ml-auto border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
+                      >
+                        <X className="w-4 h-4 mr-1" />
+                        Cancel
+                      </Button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4 sm:space-y-6">
@@ -309,8 +453,12 @@ export default function Home() {
                     </label>
                     <input
                       type="text"
-                      value={entryTitle}
-                      onChange={(e) => setEntryTitle(e.target.value)}
+                      value={editingEntry ? editTitle : entryTitle}
+                      onChange={(e) =>
+                        editingEntry
+                          ? setEditTitle(e.target.value)
+                          : setEntryTitle(e.target.value)
+                      }
                       placeholder="Give your story a title..."
                       className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 rounded-md text-base sm:text-lg transition-all duration-300"
                     />
@@ -320,8 +468,12 @@ export default function Home() {
                       Story
                     </label>
                     <Textarea
-                      value={entryContent}
-                      onChange={(e) => setEntryContent(e.target.value)}
+                      value={editingEntry ? editContent : entryContent}
+                      onChange={(e) =>
+                        editingEntry
+                          ? setEditContent(e.target.value)
+                          : setEntryContent(e.target.value)
+                      }
                       onKeyDown={handleKeyPress}
                       placeholder="Begin your story... (⌘+Enter to save)"
                       className="min-h-[150px] sm:min-h-[200px] border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 resize-none text-base sm:text-lg leading-relaxed transition-all duration-300"
@@ -329,20 +481,36 @@ export default function Home() {
                   </div>
 
                   <ImageUpload
-                    onImageUpload={setEntryImage}
-                    currentImage={entryImage}
-                    onRemoveImage={() => setEntryImage("")}
+                    onImageUpload={handleImageUpload}
+                    currentImage={editingEntry ? editImage : entryImage}
+                    currentImage2={editingEntry ? editImage2 : entryImage2}
+                    onRemoveImage={handleRemoveImage}
+                    allowMultiple={true}
                   />
-                  <Button
-                    onClick={handleAddEntry}
-                    disabled={!entryContent.trim() || !entryTitle.trim()}
-                    className="w-full h-12 sm:h-14 bg-[#948363] hover:bg-[#a39170] text-white font-semibold text-base sm:text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="text-lg sm:text-xl">✍️</span>
-                      Save Entry
-                    </span>
-                  </Button>
+
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={
+                        editingEntry ? handleUpdateEntry : handleAddEntry
+                      }
+                      disabled={!entryContent.trim() || !entryTitle.trim()}
+                      className="flex-1 h-12 sm:h-14 bg-[#948363] hover:bg-[#a39170] text-white font-semibold text-base sm:text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                    >
+                      <span className="flex items-center gap-2">
+                        {editingEntry ? (
+                          <>
+                            <Save className="w-4 h-4 sm:w-5 sm:h-5" />
+                            Update Story
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-lg sm:text-xl">✍️</span>
+                            Save Entry
+                          </>
+                        )}
+                      </span>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -350,9 +518,9 @@ export default function Home() {
 
           {/* Entries Display */}
           <div
-            className={`transition-all duration-1000 delay-400 order-1 lg:order-2 ${
+            className={`transition-all duration-1000 delay-400 order-1 xl:order-2 ${
               mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
-            } ${!isAuthor ? "lg:col-span-2" : ""}`}
+            } ${!isAuthor ? "xl:col-span-2" : ""}`}
           >
             <div className="mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-[#2d1f0f] mb-2">
@@ -376,7 +544,7 @@ export default function Home() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-4 sm:space-y-6 max-h-[500px] sm:max-h-[600px] overflow-y-auto pr-2">
+              <div className="space-y-4 sm:space-y-6 pr-2">
                 {entries.map((entry, i) => (
                   <Card
                     key={entry.id}
@@ -391,73 +559,47 @@ export default function Home() {
                         <div className="w-2 h-2 bg-[#a39170] rounded-full mt-2 sm:mt-3 flex-shrink-0"></div>
                         <div className="flex-1">
                           <div className="mb-3 sm:mb-4">
-                            <h3 className="text-lg sm:text-xl font-bold text-[#2d1f0f] mb-1 sm:mb-2">
-                              {entry.title}
-                            </h3>
-                            <p className="text-xs sm:text-sm text-[#2d1f0f]/70">
-                              {formatDate(entry.timestamp)}
-                            </p>
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h3 className="text-lg sm:text-xl font-bold text-[#2d1f0f] mb-1 sm:mb-2">
+                                  {entry.title}
+                                </h3>
+                                <p className="text-xs sm:text-sm text-[#2d1f0f]/70">
+                                  {formatDate(entry.timestamp)}
+                                </p>
+                              </div>
+                              {isAuthor && (
+                                <div className="flex items-center gap-2 ml-4">
+                                  <button
+                                    onClick={() => handleEditEntry(entry)}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-[#a39170] p-1"
+                                    title="Edit story"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteEntry(entry.id)}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-red-500 p-1"
+                                    title="Delete story"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          {entry.image_url && (
-                            <div className="mb-3 sm:mb-4 flex justify-center">
-                              <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-full sm:max-w-md">
-                                <div
-                                  className="transition-all duration-500 ease-in-out"
-                                  style={{
-                                    transform: entry.image_rotation
-                                      ? `rotate(${entry.image_rotation}deg)`
-                                      : "none",
-                                    maxWidth:
-                                      entry.image_rotation &&
-                                      entry.image_rotation % 180 === 90
-                                        ? "100%"
-                                        : "100%",
-                                    maxHeight:
-                                      entry.image_rotation &&
-                                      entry.image_rotation % 180 === 90
-                                        ? "300px"
-                                        : "400px",
-                                  }}
-                                >
-                                  <img
-                                    src={entry.image_url}
-                                    alt="Story image"
-                                    className="w-full h-full object-contain transition-all duration-500"
-                                    loading="lazy"
-                                    style={{ background: "transparent" }}
-                                  />
-                                </div>
-                                {isAuthor && (
-                                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <button
-                                      onClick={() =>
-                                        handleRotateImage(entry.id)
-                                      }
-                                      className="bg-[#948363]/80 hover:bg-[#948363] text-white p-1.5 sm:p-2 rounded-full shadow-lg transition-all duration-300"
-                                      title="Rotate image"
-                                    >
-                                      <RotateCw className="w-3 h-3 sm:w-4 sm:h-4" />
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
+                          {/* First Image */}
+                          {entry.image_url &&
+                            renderImage(entry.image_url, entry.id, false)}
+
+                          {/* Second Image */}
+                          {entry.image_url_2 &&
+                            renderImage(entry.image_url_2, entry.id, true)}
 
                           <p className="text-[#2d1f0f] leading-relaxed whitespace-pre-line text-base sm:text-lg">
                             {entry.content}
                           </p>
-                          {isAuthor && (
-                            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-[#c9c1a7]/50">
-                              <button
-                                onClick={() => handleDeleteEntry(entry.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-[#a39170] text-xs sm:text-sm"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </CardContent>

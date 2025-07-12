@@ -6,7 +6,9 @@ interface Entry {
   title: string;
   content: string;
   image_url?: string;
+  image_url_2?: string;
   timestamp: number;
+  image_rotation?: number;
 }
 
 const supabase = createClient(
@@ -51,9 +53,9 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, content, image_url } = body;
+    const { title, content, image_url, image_url_2 } = body;
 
-    console.log("Saving entry:", { title, content, image_url });
+    console.log("Saving entry:", { title, content, image_url, image_url_2 });
 
     if (!title || !content) {
       return NextResponse.json(
@@ -67,6 +69,7 @@ export async function POST(request: NextRequest) {
       title: title.trim(),
       content: content.trim(),
       image_url: image_url || null,
+      image_url_2: image_url_2 || null,
       timestamp: Date.now(),
     };
 
@@ -93,6 +96,62 @@ export async function POST(request: NextRequest) {
     console.error("Error saving entry:", error);
     return NextResponse.json(
       { error: "Failed to save entry" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, title, content, image_url, image_url_2 } = body;
+
+    console.log("Updating entry:", {
+      id,
+      title,
+      content,
+      image_url,
+      image_url_2,
+    });
+
+    if (!id || !title || !content) {
+      return NextResponse.json(
+        { error: "ID, title and content are required" },
+        { status: 400 }
+      );
+    }
+
+    const updateData = {
+      title: title.trim(),
+      content: content.trim(),
+      image_url: image_url || null,
+      image_url_2: image_url_2 || null,
+    };
+
+    console.log("Update data:", updateData);
+
+    const { data, error } = await supabase
+      .from("entries")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single();
+
+    console.log("Supabase update response:", { data, error });
+
+    if (error) {
+      console.error("Error updating entry:", error);
+      return NextResponse.json(
+        { error: "Failed to update entry", details: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error updating entry:", error);
+    return NextResponse.json(
+      { error: "Failed to update entry" },
       { status: 500 }
     );
   }
