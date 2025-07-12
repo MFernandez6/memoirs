@@ -168,40 +168,40 @@ export default function Home() {
           ></div>
         </div>
 
-        {/* Floating Geometric Shapes */}
-        <div className="absolute top-20 left-10 w-32 h-32 border-2 border-[#2d1f0f]/10 rounded-full opacity-30 float-animation"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-[#2d1f0f]/5 rounded-full opacity-40 drift-animation"></div>
+        {/* Floating Geometric Shapes - Hidden on mobile for performance */}
+        <div className="absolute top-20 left-10 w-16 h-16 md:w-32 md:h-32 border-2 border-[#2d1f0f]/10 rounded-full opacity-30 float-animation hidden sm:block"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 md:w-24 md:h-24 bg-[#2d1f0f]/5 rounded-full opacity-40 drift-animation hidden sm:block"></div>
         <div
-          className="absolute bottom-40 left-20 w-20 h-20 border-2 border-[#2d1f0f]/15 transform rotate-45 opacity-30 float-animation"
+          className="absolute bottom-40 left-20 w-10 h-10 md:w-20 md:h-20 border-2 border-[#2d1f0f]/15 transform rotate-45 opacity-30 float-animation hidden sm:block"
           style={{ animationDelay: "2s" }}
         ></div>
         <div
-          className="absolute bottom-20 right-10 w-16 h-16 bg-[#2d1f0f]/8 rounded-full opacity-50 drift-animation"
+          className="absolute bottom-20 right-10 w-8 h-8 md:w-16 md:h-16 bg-[#2d1f0f]/8 rounded-full opacity-50 drift-animation hidden sm:block"
           style={{ animationDelay: "1s" }}
         ></div>
 
-        {/* Modern Gradient Orbs */}
+        {/* Modern Gradient Orbs - Responsive sizing */}
         <div
-          className="absolute top-1/4 left-1/4 w-48 h-48 bg-gradient-to-br from-[#2d1f0f]/5 to-transparent rounded-full blur-xl opacity-20 animate-pulse"
+          className="absolute top-1/4 left-1/4 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-br from-[#2d1f0f]/5 to-transparent rounded-full blur-xl opacity-20 animate-pulse"
           style={{ animationDelay: "1.5s" }}
         ></div>
         <div
-          className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-gradient-to-tl from-[#2d1f0f]/3 to-transparent rounded-full blur-2xl opacity-15 animate-pulse"
+          className="absolute bottom-1/4 right-1/4 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-tl from-[#2d1f0f]/3 to-transparent rounded-full blur-2xl opacity-15 animate-pulse"
           style={{ animationDelay: "0.8s" }}
         ></div>
 
-        {/* Subtle Lines */}
-        <div className="absolute top-1/3 left-0 w-32 h-px bg-gradient-to-r from-transparent via-[#2d1f0f]/20 to-transparent"></div>
-        <div className="absolute bottom-1/3 right-0 w-32 h-px bg-gradient-to-l from-transparent via-[#2d1f0f]/20 to-transparent"></div>
+        {/* Subtle Lines - Responsive positioning */}
+        <div className="absolute top-1/3 left-0 w-16 md:w-32 h-px bg-gradient-to-r from-transparent via-[#2d1f0f]/20 to-transparent"></div>
+        <div className="absolute bottom-1/3 right-0 w-16 md:w-32 h-px bg-gradient-to-l from-transparent via-[#2d1f0f]/20 to-transparent"></div>
 
-        {/* Corner Accents */}
-        <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#2d1f0f]/20"></div>
-        <div className="absolute top-0 right-0 w-16 h-16 border-r-2 border-t-2 border-[#2d1f0f]/20"></div>
-        <div className="absolute bottom-0 left-0 w-16 h-16 border-l-2 border-b-2 border-[#2d1f0f]/20"></div>
-        <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#2d1f0f]/20"></div>
+        {/* Corner Accents - Responsive sizing */}
+        <div className="absolute top-0 left-0 w-8 h-8 md:w-16 md:h-16 border-l-2 border-t-2 border-[#2d1f0f]/20"></div>
+        <div className="absolute top-0 right-0 w-8 h-8 md:w-16 md:h-16 border-r-2 border-t-2 border-[#2d1f0f]/20"></div>
+        <div className="absolute bottom-0 left-0 w-8 h-8 md:w-16 md:h-16 border-l-2 border-b-2 border-[#2d1f0f]/20"></div>
+        <div className="absolute bottom-0 right-0 w-8 h-8 md:w-16 md:h-16 border-r-2 border-b-2 border-[#2d1f0f]/20"></div>
 
-        {/* Modern Dots Pattern */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 opacity-[0.02]">
+        {/* Modern Dots Pattern - Responsive sizing */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-96 md:h-96 opacity-[0.02]">
           <div
             className="absolute inset-0"
             style={{
@@ -211,36 +211,36 @@ export default function Home() {
           ></div>
         </div>
 
-        {/* Floating Particles */}
+        {/* Floating Particles - Hidden on mobile */}
         <div
-          className="absolute top-1/4 right-1/3 w-2 h-2 bg-[#2d1f0f]/30 rounded-full animate-ping"
+          className="absolute top-1/4 right-1/3 w-2 h-2 bg-[#2d1f0f]/30 rounded-full animate-ping hidden sm:block"
           style={{ animationDelay: "0.3s" }}
         ></div>
         <div
-          className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-[#2d1f0f]/40 rounded-full animate-ping"
+          className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-[#2d1f0f]/40 rounded-full animate-ping hidden sm:block"
           style={{ animationDelay: "1.2s" }}
         ></div>
         <div
-          className="absolute top-3/4 left-1/4 w-1.5 h-1.5 bg-[#2d1f0f]/25 rounded-full animate-ping"
+          className="absolute top-3/4 left-1/4 w-1.5 h-1.5 bg-[#2d1f0f]/25 rounded-full animate-ping hidden sm:block"
           style={{ animationDelay: "0.7s" }}
         ></div>
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 py-16">
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 py-8 sm:py-16">
         {/* Header Section */}
         <header
-          className={`text-center mb-16 transition-all duration-1000 ${
+          className={`text-center mb-8 sm:mb-16 transition-all duration-1000 ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <div className="inline-block mb-8">
-            <div className="w-24 h-1 bg-gradient-to-r from-[#948363] to-[#a39170] mx-auto mb-4"></div>
-            <h1 className="text-6xl md:text-8xl font-black text-[#2d1f0f] tracking-tight">
+          <div className="inline-block mb-6 sm:mb-8">
+            <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-[#948363] to-[#a39170] mx-auto mb-3 sm:mb-4"></div>
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-[#2d1f0f] tracking-tight leading-tight">
               MEMOIR
             </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-[#a39170] to-[#948363] mx-auto mt-4"></div>
+            <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-[#a39170] to-[#948363] mx-auto mt-3 sm:mt-4"></div>
           </div>
-          <p className="text-xl md:text-2xl text-[#2d1f0f] max-w-3xl mx-auto font-light leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-[#2d1f0f] max-w-3xl mx-auto font-light leading-relaxed px-4">
             A collection of moments, thoughts, and stories.
             <br />
             <span className="font-medium text-[#2d1f0f]">
@@ -249,31 +249,31 @@ export default function Home() {
           </p>
 
           {/* Author Status */}
-          <div className="mt-8 flex justify-center gap-4">
+          <div className="mt-6 sm:mt-8 flex justify-center gap-3 sm:gap-4">
             {isAuthor ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-[#2d1f0f] font-medium">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-xs sm:text-sm text-[#2d1f0f] font-medium">
                   ✍️ Author Mode
                 </span>
                 <Button
                   onClick={handleLogout}
                   variant="outline"
                   size="sm"
-                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
+                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300 text-xs sm:text-sm"
                 >
                   Logout
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-[#2d1f0f] font-medium">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="text-xs sm:text-sm text-[#2d1f0f] font-medium">
                   👁️ Read Only
                 </span>
                 <Button
                   onClick={() => setShowLogin(true)}
                   variant="outline"
                   size="sm"
-                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
+                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300 text-xs sm:text-sm"
                 >
                   Author Login
                 </Button>
@@ -282,27 +282,27 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+        {/* Main Content Grid - Responsive layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 max-w-7xl mx-auto">
           {/* Writing Section - Only visible to author */}
           {isAuthor && (
             <div
-              className={`transition-all duration-1000 delay-200 ${
+              className={`transition-all duration-1000 delay-200 order-2 lg:order-1 ${
                 mounted
                   ? "opacity-100 translate-x-0"
                   : "opacity-0 -translate-x-8"
               }`}
             >
               <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl border-l-4 border-l-[#a39170]">
-                <CardHeader className="pb-6">
+                <CardHeader className="pb-4 sm:pb-6">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-[#a39170] rounded-full"></div>
-                    <CardTitle className="text-2xl font-bold text-[#2d1f0f]">
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-[#2d1f0f]">
                       New Entry
                     </CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6">
                   <div>
                     <label className="text-sm font-medium text-[#2d1f0f] mb-2 block">
                       Title
@@ -312,7 +312,7 @@ export default function Home() {
                       value={entryTitle}
                       onChange={(e) => setEntryTitle(e.target.value)}
                       placeholder="Give your story a title..."
-                      className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 rounded-md text-lg transition-all duration-300"
+                      className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 rounded-md text-base sm:text-lg transition-all duration-300"
                     />
                   </div>
                   <div>
@@ -324,7 +324,7 @@ export default function Home() {
                       onChange={(e) => setEntryContent(e.target.value)}
                       onKeyDown={handleKeyPress}
                       placeholder="Begin your story... (⌘+Enter to save)"
-                      className="min-h-[200px] border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 resize-none text-lg leading-relaxed transition-all duration-300"
+                      className="min-h-[150px] sm:min-h-[200px] border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 resize-none text-base sm:text-lg leading-relaxed transition-all duration-300"
                     />
                   </div>
 
@@ -336,10 +336,10 @@ export default function Home() {
                   <Button
                     onClick={handleAddEntry}
                     disabled={!entryContent.trim() || !entryTitle.trim()}
-                    className="w-full h-14 bg-[#948363] hover:bg-[#a39170] text-white font-semibold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                    className="w-full h-12 sm:h-14 bg-[#948363] hover:bg-[#a39170] text-white font-semibold text-base sm:text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                   >
                     <span className="flex items-center gap-2">
-                      <span className="text-xl">✍️</span>
+                      <span className="text-lg sm:text-xl">✍️</span>
                       Save Entry
                     </span>
                   </Button>
@@ -350,33 +350,33 @@ export default function Home() {
 
           {/* Entries Display */}
           <div
-            className={`transition-all duration-1000 delay-400 ${
+            className={`transition-all duration-1000 delay-400 order-1 lg:order-2 ${
               mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
             } ${!isAuthor ? "lg:col-span-2" : ""}`}
           >
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-[#2d1f0f] mb-2">
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#2d1f0f] mb-2">
                 {isAuthor ? "Your Stories" : "Miguel's Stories"}
               </h2>
-              <div className="w-16 h-1 bg-gradient-to-r from-[#a39170] to-[#948363]"></div>
+              <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#a39170] to-[#948363]"></div>
             </div>
 
             {entries.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-[#948363] to-[#a39170] rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white text-3xl">📖</span>
+              <div className="text-center py-12 sm:py-20">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-[#948363] to-[#a39170] rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white text-2xl sm:text-3xl">📖</span>
                 </div>
-                <h3 className="text-xl font-semibold text-[#2d1f0f] mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold text-[#2d1f0f] mb-2">
                   {isAuthor ? "No entries yet" : "No stories shared yet"}
                 </h3>
-                <p className="text-[#2d1f0f]">
+                <p className="text-[#2d1f0f] text-sm sm:text-base">
                   {isAuthor
                     ? "Start writing to see your stories here"
                     : "Check back later for new stories"}
                 </p>
               </div>
             ) : (
-              <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+              <div className="space-y-4 sm:space-y-6 max-h-[500px] sm:max-h-[600px] overflow-y-auto pr-2">
                 {entries.map((entry, i) => (
                   <Card
                     key={entry.id}
@@ -386,22 +386,22 @@ export default function Home() {
                       animation: "slideInRight 0.6s ease-out forwards",
                     }}
                   >
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <div className="w-2 h-2 bg-[#a39170] rounded-full mt-3 flex-shrink-0"></div>
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="w-2 h-2 bg-[#a39170] rounded-full mt-2 sm:mt-3 flex-shrink-0"></div>
                         <div className="flex-1">
-                          <div className="mb-4">
-                            <h3 className="text-xl font-bold text-[#2d1f0f] mb-2">
+                          <div className="mb-3 sm:mb-4">
+                            <h3 className="text-lg sm:text-xl font-bold text-[#2d1f0f] mb-1 sm:mb-2">
                               {entry.title}
                             </h3>
-                            <p className="text-sm text-[#2d1f0f]/70">
+                            <p className="text-xs sm:text-sm text-[#2d1f0f]/70">
                               {formatDate(entry.timestamp)}
                             </p>
                           </div>
 
                           {entry.image_url && (
-                            <div className="mb-4 flex justify-center">
-                              <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-md">
+                            <div className="mb-3 sm:mb-4 flex justify-center">
+                              <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-full sm:max-w-md">
                                 <div
                                   className="transition-all duration-500 ease-in-out"
                                   style={{
@@ -411,12 +411,12 @@ export default function Home() {
                                     maxWidth:
                                       entry.image_rotation &&
                                       entry.image_rotation % 180 === 90
-                                        ? "400px"
-                                        : "320px",
+                                        ? "100%"
+                                        : "100%",
                                     maxHeight:
                                       entry.image_rotation &&
                                       entry.image_rotation % 180 === 90
-                                        ? "320px"
+                                        ? "300px"
                                         : "400px",
                                   }}
                                 >
@@ -434,10 +434,10 @@ export default function Home() {
                                       onClick={() =>
                                         handleRotateImage(entry.id)
                                       }
-                                      className="bg-[#948363]/80 hover:bg-[#948363] text-white p-2 rounded-full shadow-lg transition-all duration-300"
+                                      className="bg-[#948363]/80 hover:bg-[#948363] text-white p-1.5 sm:p-2 rounded-full shadow-lg transition-all duration-300"
                                       title="Rotate image"
                                     >
-                                      <RotateCw className="w-4 h-4" />
+                                      <RotateCw className="w-3 h-3 sm:w-4 sm:h-4" />
                                     </button>
                                   </div>
                                 )}
@@ -445,14 +445,14 @@ export default function Home() {
                             </div>
                           )}
 
-                          <p className="text-[#2d1f0f] leading-relaxed whitespace-pre-line text-lg">
+                          <p className="text-[#2d1f0f] leading-relaxed whitespace-pre-line text-base sm:text-lg">
                             {entry.content}
                           </p>
                           {isAuthor && (
-                            <div className="mt-4 pt-4 border-t border-[#c9c1a7]/50">
+                            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-[#c9c1a7]/50">
                               <button
                                 onClick={() => handleDeleteEntry(entry.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-[#a39170] text-sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-[#a39170] text-xs sm:text-sm"
                               >
                                 Delete
                               </button>
@@ -470,12 +470,12 @@ export default function Home() {
 
         {/* Footer */}
         <footer
-          className={`text-center mt-20 transition-all duration-1000 delay-600 ${
+          className={`text-center mt-12 sm:mt-20 transition-all duration-1000 delay-600 ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <div className="w-32 h-1 bg-gradient-to-r from-[#948363] to-[#a39170] mx-auto mb-4"></div>
-          <p className="text-[#2d1f0f] font-medium">
+          <div className="w-20 sm:w-32 h-1 bg-gradient-to-r from-[#948363] to-[#a39170] mx-auto mb-3 sm:mb-4"></div>
+          <p className="text-[#2d1f0f] font-medium text-sm sm:text-base px-4">
             Every story matters. Every moment counts.
           </p>
         </footer>
@@ -483,10 +483,10 @@ export default function Home() {
 
       {/* Login Modal */}
       {showLogin && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-sm border-l-4 border-l-[#a39170]">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm border-l-4 border-l-[#a39170]">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-[#2d1f0f]">
+              <CardTitle className="text-xl sm:text-2xl font-bold text-[#2d1f0f]">
                 Author Login
               </CardTitle>
             </CardHeader>
@@ -500,14 +500,14 @@ export default function Home() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                  className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] rounded-md transition-all duration-300"
+                  className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] rounded-md transition-all duration-300 text-base"
                   placeholder="Enter password"
                 />
               </div>
               <div className="flex gap-3">
                 <Button
                   onClick={handleLogin}
-                  className="flex-1 bg-[#948363] hover:bg-[#a39170] text-white transition-all duration-300"
+                  className="flex-1 bg-[#948363] hover:bg-[#a39170] text-white transition-all duration-300 text-sm sm:text-base"
                 >
                   Login
                 </Button>
@@ -517,7 +517,7 @@ export default function Home() {
                     setPassword("");
                   }}
                   variant="outline"
-                  className="flex-1 border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
+                  className="flex-1 border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300 text-sm sm:text-base"
                 >
                   Cancel
                 </Button>
@@ -570,6 +570,14 @@ export default function Home() {
 
         .drift-animation {
           animation: drift 8s ease-in-out infinite;
+        }
+
+        /* Mobile-specific optimizations */
+        @media (max-width: 640px) {
+          .container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
         }
       `}</style>
     </div>

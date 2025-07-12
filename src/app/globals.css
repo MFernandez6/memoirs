@@ -64,6 +64,35 @@ body {
   color: hsl(var(--foreground));
 }
 
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Improve touch targets */
+  button,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent zoom on input focus */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  /* Improve scrolling performance */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Optimize text rendering */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
 /* Custom styles for rotated images */
 .rotated-image-container {
   transform-origin: center center;
@@ -98,4 +127,18 @@ body {
 .rotated-image-container img {
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+}
+
+/* Mobile-specific image optimizations */
+@media (max-width: 640px) {
+  .rotated-image-container[style*="rotate(90deg)"],
+  .rotated-image-container[style*="rotate(270deg)"] {
+    max-width: 100% !important;
+    max-height: 300px !important;
+  }
+
+  .rotated-image-container[style*="rotate(180deg)"] {
+    max-width: 100% !important;
+    max-height: 300px !important;
+  }
 }

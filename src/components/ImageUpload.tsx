@@ -67,29 +67,29 @@ export default function ImageUpload({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <label className="text-sm font-medium text-[#948363] mb-2 block">
         Image (Optional)
       </label>
 
       {displayImage ? (
-        <div className="mb-4 flex justify-center">
-          <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-md">
+        <div className="mb-3 sm:mb-4 flex justify-center">
+          <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-full sm:max-w-md">
             <div className="transition-all duration-500 ease-in-out">
               <img
                 src={displayImage}
                 alt="Story image"
-                className="w-full max-h-80 object-contain transition-all duration-500"
+                className="w-full max-h-60 sm:max-h-80 object-contain transition-all duration-500"
                 style={{ background: "transparent" }}
               />
             </div>
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
               <button
                 onClick={handleRemoveImage}
-                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#948363]/80 hover:bg-[#948363] text-white p-2 rounded-full shadow-lg"
+                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#948363]/80 hover:bg-[#948363] text-white p-1.5 sm:p-2 rounded-full shadow-lg"
                 title="Remove image"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
@@ -97,31 +97,31 @@ export default function ImageUpload({
       ) : (
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-300 ${
+          className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center cursor-pointer transition-all duration-300 ${
             isDragActive
               ? "border-[#a39170] bg-[#a39170]/10"
               : "border-[#c9c1a7] hover:border-[#a39170] hover:bg-[#a39170]/5"
           }`}
         >
           <input {...getInputProps()} />
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 bg-[#948363]/10 rounded-full flex items-center justify-center">
-              <Upload className="w-6 h-6 text-[#948363]" />
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#948363]/10 rounded-full flex items-center justify-center">
+              <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-[#948363]" />
             </div>
             <div>
-              <p className="text-[#948363] font-medium mb-1">
+              <p className="text-[#948363] font-medium mb-1 text-sm sm:text-base">
                 {isDragActive
                   ? "Drop your image here"
                   : "Drag & drop an image here"}
               </p>
-              <p className="text-[#948363]/60 text-sm">
+              <p className="text-[#948363]/60 text-xs sm:text-sm">
                 or click to browse files
               </p>
             </div>
             {isUploading && (
               <div className="flex items-center gap-2 text-[#948363]">
-                <div className="w-4 h-4 border-2 border-[#948363] border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-sm">Uploading...</span>
+                <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-[#948363] border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-xs sm:text-sm">Uploading...</span>
               </div>
             )}
           </div>
