@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { X, Upload, Plus } from "lucide-react";
+import { useUploadThing } from "@/lib/uploadthing";
 
 interface ImageUploadProps {
   onImageUpload: (imageUrl: string, imageIndex?: number) => void;
@@ -25,6 +26,27 @@ export default function ImageUpload({
   );
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
+  const { startUpload, isUploading } = useUploadThing("imageUploader", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        const imageUrl = res[0].url;
+        if (uploadingIndex === 1) {
+          setDisplayImage2(imageUrl);
+          onImageUpload(imageUrl, 1);
+        } else {
+          setDisplayImage(imageUrl);
+          onImageUpload(imageUrl, 0);
+        }
+      }
+      setUploadingIndex(null);
+    },
+    onUploadError: (error: Error) => {
+      console.error("Upload error:", error);
+      alert("Failed to upload image. Please try again.");
+      setUploadingIndex(null);
+    },
+  });
+
   const onDrop = useCallback(
     async (acceptedFiles: File[], imageIndex: number = 0) => {
       if (acceptedFiles.length === 0) return;
@@ -33,37 +55,14 @@ export default function ImageUpload({
       setUploadingIndex(imageIndex);
 
       try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("/api/uploadthing", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const imageUrl = data.url;
-
-          if (imageIndex === 0) {
-            setDisplayImage(imageUrl);
-            onImageUpload(imageUrl, 0);
-          } else {
-            setDisplayImage2(imageUrl);
-            onImageUpload(imageUrl, 1);
-          }
-        } else {
-          console.error("Upload failed");
-          alert("Failed to upload image. Please try again.");
-        }
+        await startUpload([file]);
       } catch (error) {
         console.error("Upload error:", error);
         alert("Failed to upload image. Please try again.");
-      } finally {
         setUploadingIndex(null);
       }
     },
-    [onImageUpload]
+    [startUpload]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -124,7 +123,7 @@ export default function ImageUpload({
     const rootProps = imageIndex === 0 ? getRootProps : getRootProps2;
     const inputProps = imageIndex === 0 ? getInputProps : getInputProps2;
     const dragActive = imageIndex === 0 ? isDragActive : isDragActive2;
-    const isUploadingThis = uploadingIndex === imageIndex;
+    const isUploadingThis = uploadingIndex === imageIndex || isUploading;
 
     return (
       <div
