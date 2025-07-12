@@ -5,14 +5,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import ImageUpload from "@/components/ImageUpload";
-import { RotateCw, Edit, X, Save } from "lucide-react";
+import { RotateCw } from "lucide-react";
 
 interface Entry {
   id: string;
   title: string;
   content: string;
   image_url?: string;
-  image_url_2?: string;
   timestamp: number;
   image_rotation?: number;
 }
@@ -21,17 +20,11 @@ export default function Home() {
   const [entryTitle, setEntryTitle] = useState("");
   const [entryContent, setEntryContent] = useState("");
   const [entryImage, setEntryImage] = useState<string>("");
-  const [entryImage2, setEntryImage2] = useState<string>("");
   const [entries, setEntries] = useState<Entry[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isAuthor, setIsAuthor] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [password, setPassword] = useState("");
-  const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [editImage, setEditImage] = useState<string>("");
-  const [editImage2, setEditImage2] = useState<string>("");
 
   // Load entries from API on component mount
   useEffect(() => {
@@ -68,7 +61,6 @@ export default function Home() {
             title: entryTitle.trim(),
             content: entryContent.trim(),
             image_url: entryImage || null,
-            image_url_2: entryImage2 || null,
           }),
         });
 
@@ -78,47 +70,12 @@ export default function Home() {
           setEntryTitle("");
           setEntryContent("");
           setEntryImage("");
-          setEntryImage2("");
         } else {
           console.error("Failed to save entry");
         }
       } catch (error) {
         console.error("Error saving entry:", error);
       }
-    }
-  };
-
-  const handleUpdateEntry = async () => {
-    if (!editingEntry || !editContent.trim() || !editTitle.trim()) return;
-
-    try {
-      const response = await fetch("/api/entries", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: editingEntry.id,
-          title: editTitle.trim(),
-          content: editContent.trim(),
-          image_url: editImage || null,
-          image_url_2: editImage2 || null,
-        }),
-      });
-
-      if (response.ok) {
-        const updatedEntry = await response.json();
-        setEntries(
-          entries.map((entry) =>
-            entry.id === editingEntry.id ? updatedEntry : entry
-          )
-        );
-        handleCancelEdit();
-      } else {
-        console.error("Failed to update entry");
-      }
-    } catch (error) {
-      console.error("Error updating entry:", error);
     }
   };
 
@@ -139,61 +96,9 @@ export default function Home() {
     }
   };
 
-  const handleEditEntry = (entry: Entry) => {
-    setEditingEntry(entry);
-    setEditTitle(entry.title);
-    setEditContent(entry.content);
-    setEditImage(entry.image_url || "");
-    setEditImage2(entry.image_url_2 || "");
-  };
-
-  const handleCancelEdit = () => {
-    setEditingEntry(null);
-    setEditTitle("");
-    setEditContent("");
-    setEditImage("");
-    setEditImage2("");
-  };
-
-  const handleImageUpload = (imageUrl: string, imageIndex?: number) => {
-    if (editingEntry) {
-      if (imageIndex === 1) {
-        setEditImage2(imageUrl);
-      } else {
-        setEditImage(imageUrl);
-      }
-    } else {
-      if (imageIndex === 1) {
-        setEntryImage2(imageUrl);
-      } else {
-        setEntryImage(imageUrl);
-      }
-    }
-  };
-
-  const handleRemoveImage = (imageIndex?: number) => {
-    if (editingEntry) {
-      if (imageIndex === 1) {
-        setEditImage2("");
-      } else {
-        setEditImage("");
-      }
-    } else {
-      if (imageIndex === 1) {
-        setEntryImage2("");
-      } else {
-        setEntryImage("");
-      }
-    }
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && e.metaKey) {
-      if (editingEntry) {
-        handleUpdateEntry();
-      } else {
-        handleAddEntry();
-      }
+      handleAddEntry();
     }
   };
 
@@ -245,44 +150,6 @@ export default function Home() {
     }
   };
 
-  const renderImage = (
-    imageUrl: string,
-    entryId: string,
-    isSecondImage = false
-  ) => (
-    <div className="mb-3 sm:mb-4 flex justify-center">
-      <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-full sm:max-w-lg md:max-w-xl">
-        <div
-          className="transition-all duration-500 ease-in-out"
-          style={{
-            transform: isSecondImage ? "none" : "none", // You can add rotation logic for second image if needed
-            maxWidth: "100%",
-            maxHeight: "400px",
-          }}
-        >
-          <img
-            src={imageUrl}
-            alt={`Story image ${isSecondImage ? "2" : "1"}`}
-            className="w-full h-full object-contain transition-all duration-500"
-            loading="lazy"
-            style={{ background: "transparent" }}
-          />
-        </div>
-        {isAuthor && (
-          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button
-              onClick={() => handleRotateImage(entryId)}
-              className="bg-[#948363]/80 hover:bg-[#948363] text-white p-1.5 sm:p-2 rounded-full shadow-lg transition-all duration-300"
-              title="Rotate image"
-            >
-              <RotateCw className="w-3 h-3 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#dfdac4] via-[#c9c1a7] to-[#b0a384] relative">
       {/* Modern Background Design */}
@@ -302,39 +169,39 @@ export default function Home() {
         </div>
 
         {/* Floating Geometric Shapes - Hidden on mobile for performance */}
-        <div className="absolute top-20 left-10 w-16 h-16 md:w-32 md:h-32 border-2 border-[#2d1f0f]/10 rounded-full opacity-30 float-animation hidden sm:block"></div>
-        <div className="absolute top-40 right-20 w-12 h-12 md:w-24 md:h-24 bg-[#2d1f0f]/5 rounded-full opacity-40 drift-animation hidden sm:block"></div>
+        <div className="absolute top-20 left-10 w-32 h-32 border-2 border-[#2d1f0f]/10 rounded-full opacity-30 float-animation hidden md:block"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-[#2d1f0f]/5 rounded-full opacity-40 drift-animation hidden md:block"></div>
         <div
-          className="absolute bottom-40 left-20 w-10 h-10 md:w-20 md:h-20 border-2 border-[#2d1f0f]/15 transform rotate-45 opacity-30 float-animation hidden sm:block"
+          className="absolute bottom-40 left-20 w-20 h-20 border-2 border-[#2d1f0f]/15 transform rotate-45 opacity-30 float-animation hidden md:block"
           style={{ animationDelay: "2s" }}
         ></div>
         <div
-          className="absolute bottom-20 right-10 w-8 h-8 md:w-16 md:h-16 bg-[#2d1f0f]/8 rounded-full opacity-50 drift-animation hidden sm:block"
+          className="absolute bottom-20 right-10 w-16 h-16 bg-[#2d1f0f]/8 rounded-full opacity-50 drift-animation hidden md:block"
           style={{ animationDelay: "1s" }}
         ></div>
 
-        {/* Modern Gradient Orbs - Responsive sizing */}
+        {/* Modern Gradient Orbs - Hidden on mobile for performance */}
         <div
-          className="absolute top-1/4 left-1/4 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-br from-[#2d1f0f]/5 to-transparent rounded-full blur-xl opacity-20 animate-pulse"
+          className="absolute top-1/4 left-1/4 w-48 h-48 bg-gradient-to-br from-[#2d1f0f]/5 to-transparent rounded-full blur-xl opacity-20 animate-pulse hidden md:block"
           style={{ animationDelay: "1.5s" }}
         ></div>
         <div
-          className="absolute bottom-1/4 right-1/4 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-tl from-[#2d1f0f]/3 to-transparent rounded-full blur-2xl opacity-15 animate-pulse"
+          className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-gradient-to-tl from-[#2d1f0f]/3 to-transparent rounded-full blur-2xl opacity-15 animate-pulse hidden md:block"
           style={{ animationDelay: "0.8s" }}
         ></div>
 
-        {/* Subtle Lines - Responsive positioning */}
-        <div className="absolute top-1/3 left-0 w-16 md:w-32 h-px bg-gradient-to-r from-transparent via-[#2d1f0f]/20 to-transparent"></div>
-        <div className="absolute bottom-1/3 right-0 w-16 md:w-32 h-px bg-gradient-to-l from-transparent via-[#2d1f0f]/20 to-transparent"></div>
+        {/* Subtle Lines - Hidden on mobile */}
+        <div className="absolute top-1/3 left-0 w-32 h-px bg-gradient-to-r from-transparent via-[#2d1f0f]/20 to-transparent hidden md:block"></div>
+        <div className="absolute bottom-1/3 right-0 w-32 h-px bg-gradient-to-l from-transparent via-[#2d1f0f]/20 to-transparent hidden md:block"></div>
 
-        {/* Corner Accents - Responsive sizing */}
-        <div className="absolute top-0 left-0 w-8 h-8 md:w-16 md:h-16 border-l-2 border-t-2 border-[#2d1f0f]/20"></div>
-        <div className="absolute top-0 right-0 w-8 h-8 md:w-16 md:h-16 border-r-2 border-t-2 border-[#2d1f0f]/20"></div>
-        <div className="absolute bottom-0 left-0 w-8 h-8 md:w-16 md:h-16 border-l-2 border-b-2 border-[#2d1f0f]/20"></div>
-        <div className="absolute bottom-0 right-0 w-8 h-8 md:w-16 md:h-16 border-r-2 border-b-2 border-[#2d1f0f]/20"></div>
+        {/* Corner Accents - Hidden on mobile */}
+        <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#2d1f0f]/20 hidden md:block"></div>
+        <div className="absolute top-0 right-0 w-16 h-16 border-r-2 border-t-2 border-[#2d1f0f]/20 hidden md:block"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 border-l-2 border-b-2 border-[#2d1f0f]/20 hidden md:block"></div>
+        <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#2d1f0f]/20 hidden md:block"></div>
 
-        {/* Modern Dots Pattern - Responsive sizing */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-96 md:h-96 opacity-[0.02]">
+        {/* Modern Dots Pattern - Hidden on mobile */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 opacity-[0.02] hidden md:block">
           <div
             className="absolute inset-0"
             style={{
@@ -346,15 +213,15 @@ export default function Home() {
 
         {/* Floating Particles - Hidden on mobile */}
         <div
-          className="absolute top-1/4 right-1/3 w-2 h-2 bg-[#2d1f0f]/30 rounded-full animate-ping hidden sm:block"
+          className="absolute top-1/4 right-1/3 w-2 h-2 bg-[#2d1f0f]/30 rounded-full animate-ping hidden md:block"
           style={{ animationDelay: "0.3s" }}
         ></div>
         <div
-          className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-[#2d1f0f]/40 rounded-full animate-ping hidden sm:block"
+          className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-[#2d1f0f]/40 rounded-full animate-ping hidden md:block"
           style={{ animationDelay: "1.2s" }}
         ></div>
         <div
-          className="absolute top-3/4 left-1/4 w-1.5 h-1.5 bg-[#2d1f0f]/25 rounded-full animate-ping hidden sm:block"
+          className="absolute top-3/4 left-1/4 w-1.5 h-1.5 bg-[#2d1f0f]/25 rounded-full animate-ping hidden md:block"
           style={{ animationDelay: "0.7s" }}
         ></div>
       </div>
@@ -375,7 +242,7 @@ export default function Home() {
           </div>
           <p className="text-lg sm:text-xl md:text-2xl text-[#2d1f0f] max-w-3xl mx-auto font-light leading-relaxed px-4">
             A collection of moments, thoughts, and stories.
-            <br />
+            <br className="hidden sm:block" />
             <span className="font-medium text-[#2d1f0f]">
               Your digital legacy begins here.
             </span>
@@ -384,29 +251,29 @@ export default function Home() {
           {/* Author Status */}
           <div className="mt-6 sm:mt-8 flex justify-center gap-3 sm:gap-4">
             {isAuthor ? (
-              <div className="flex items-center gap-2 sm:gap-3">
-                <span className="text-xs sm:text-sm text-[#2d1f0f] font-medium">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+                <span className="text-sm text-[#2d1f0f] font-medium">
                   ✍️ Author Mode
                 </span>
                 <Button
                   onClick={handleLogout}
                   variant="outline"
                   size="sm"
-                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300 text-xs sm:text-sm"
+                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
                 >
                   Logout
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 sm:gap-3">
-                <span className="text-xs sm:text-sm text-[#2d1f0f] font-medium">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+                <span className="text-sm text-[#2d1f0f] font-medium">
                   👁️ Read Only
                 </span>
                 <Button
                   onClick={() => setShowLogin(true)}
                   variant="outline"
                   size="sm"
-                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300 text-xs sm:text-sm"
+                  className="border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
                 >
                   Author Login
                 </Button>
@@ -415,12 +282,12 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Main Content Grid - Responsive layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 xl:gap-12 max-w-8xl mx-auto">
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 max-w-7xl mx-auto">
           {/* Writing Section - Only visible to author */}
           {isAuthor && (
             <div
-              className={`transition-all duration-1000 delay-200 order-2 xl:order-1 ${
+              className={`transition-all duration-1000 delay-200 ${
                 mounted
                   ? "opacity-100 translate-x-0"
                   : "opacity-0 -translate-x-8"
@@ -431,19 +298,8 @@ export default function Home() {
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-[#a39170] rounded-full"></div>
                     <CardTitle className="text-xl sm:text-2xl font-bold text-[#2d1f0f]">
-                      {editingEntry ? "Edit Story" : "New Entry"}
+                      New Entry
                     </CardTitle>
-                    {editingEntry && (
-                      <Button
-                        onClick={handleCancelEdit}
-                        variant="outline"
-                        size="sm"
-                        className="ml-auto border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Cancel
-                      </Button>
-                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4 sm:space-y-6">
@@ -453,12 +309,8 @@ export default function Home() {
                     </label>
                     <input
                       type="text"
-                      value={editingEntry ? editTitle : entryTitle}
-                      onChange={(e) =>
-                        editingEntry
-                          ? setEditTitle(e.target.value)
-                          : setEntryTitle(e.target.value)
-                      }
+                      value={entryTitle}
+                      onChange={(e) => setEntryTitle(e.target.value)}
                       placeholder="Give your story a title..."
                       className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 rounded-md text-base sm:text-lg transition-all duration-300"
                     />
@@ -468,12 +320,8 @@ export default function Home() {
                       Story
                     </label>
                     <Textarea
-                      value={editingEntry ? editContent : entryContent}
-                      onChange={(e) =>
-                        editingEntry
-                          ? setEditContent(e.target.value)
-                          : setEntryContent(e.target.value)
-                      }
+                      value={entryContent}
+                      onChange={(e) => setEntryContent(e.target.value)}
                       onKeyDown={handleKeyPress}
                       placeholder="Begin your story... (⌘+Enter to save)"
                       className="min-h-[150px] sm:min-h-[200px] border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] placeholder-[#2d1f0f]/50 resize-none text-base sm:text-lg leading-relaxed transition-all duration-300"
@@ -481,36 +329,20 @@ export default function Home() {
                   </div>
 
                   <ImageUpload
-                    onImageUpload={handleImageUpload}
-                    currentImage={editingEntry ? editImage : entryImage}
-                    currentImage2={editingEntry ? editImage2 : entryImage2}
-                    onRemoveImage={handleRemoveImage}
-                    allowMultiple={true}
+                    onImageUpload={setEntryImage}
+                    currentImage={entryImage}
+                    onRemoveImage={() => setEntryImage("")}
                   />
-
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={
-                        editingEntry ? handleUpdateEntry : handleAddEntry
-                      }
-                      disabled={!entryContent.trim() || !entryTitle.trim()}
-                      className="flex-1 h-12 sm:h-14 bg-[#948363] hover:bg-[#a39170] text-white font-semibold text-base sm:text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                    >
-                      <span className="flex items-center gap-2">
-                        {editingEntry ? (
-                          <>
-                            <Save className="w-4 h-4 sm:w-5 sm:h-5" />
-                            Update Story
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-lg sm:text-xl">✍️</span>
-                            Save Entry
-                          </>
-                        )}
-                      </span>
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={handleAddEntry}
+                    disabled={!entryContent.trim() || !entryTitle.trim()}
+                    className="w-full h-12 sm:h-14 bg-[#948363] hover:bg-[#a39170] text-white font-semibold text-base sm:text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg sm:text-xl">✍️</span>
+                      Save Entry
+                    </span>
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -518,9 +350,9 @@ export default function Home() {
 
           {/* Entries Display */}
           <div
-            className={`transition-all duration-1000 delay-400 order-1 xl:order-2 ${
+            className={`transition-all duration-1000 delay-400 ${
               mounted ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
-            } ${!isAuthor ? "xl:col-span-2" : ""}`}
+            } ${!isAuthor ? "lg:col-span-2" : ""}`}
           >
             <div className="mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-[#2d1f0f] mb-2">
@@ -531,7 +363,7 @@ export default function Home() {
 
             {entries.length === 0 ? (
               <div className="text-center py-12 sm:py-20">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-[#948363] to-[#a39170] rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-16 sm:w-20 h-16 sm:h-20 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-[#948363] to-[#a39170] rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-white text-2xl sm:text-3xl">📖</span>
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-[#2d1f0f] mb-2">
@@ -544,7 +376,7 @@ export default function Home() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-4 sm:space-y-6 pr-2">
+              <div className="space-y-4 sm:space-y-6 max-h-[500px] sm:max-h-[600px] overflow-y-auto pr-2">
                 {entries.map((entry, i) => (
                   <Card
                     key={entry.id}
@@ -557,49 +389,75 @@ export default function Home() {
                     <CardContent className="p-4 sm:p-6">
                       <div className="flex items-start gap-3 sm:gap-4">
                         <div className="w-2 h-2 bg-[#a39170] rounded-full mt-2 sm:mt-3 flex-shrink-0"></div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="mb-3 sm:mb-4">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h3 className="text-lg sm:text-xl font-bold text-[#2d1f0f] mb-1 sm:mb-2">
-                                  {entry.title}
-                                </h3>
-                                <p className="text-xs sm:text-sm text-[#2d1f0f]/70">
-                                  {formatDate(entry.timestamp)}
-                                </p>
-                              </div>
-                              {isAuthor && (
-                                <div className="flex items-center gap-2 ml-4">
-                                  <button
-                                    onClick={() => handleEditEntry(entry)}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-[#a39170] p-1"
-                                    title="Edit story"
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteEntry(entry.id)}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-red-500 p-1"
-                                    title="Delete story"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              )}
-                            </div>
+                            <h3 className="text-lg sm:text-xl font-bold text-[#2d1f0f] mb-1 sm:mb-2 break-words">
+                              {entry.title}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-[#2d1f0f]/70">
+                              {formatDate(entry.timestamp)}
+                            </p>
                           </div>
 
-                          {/* First Image */}
-                          {entry.image_url &&
-                            renderImage(entry.image_url, entry.id, false)}
+                          {entry.image_url && (
+                            <div className="mb-3 sm:mb-4 flex justify-center">
+                              <div className="relative inline-block rounded-lg overflow-hidden border-2 border-[#a39170]/30 shadow-lg group max-w-full sm:max-w-md">
+                                <div
+                                  className="transition-all duration-500 ease-in-out"
+                                  style={{
+                                    transform: entry.image_rotation
+                                      ? `rotate(${entry.image_rotation}deg)`
+                                      : "none",
+                                    maxWidth:
+                                      entry.image_rotation &&
+                                      entry.image_rotation % 180 === 90
+                                        ? "300px"
+                                        : "280px",
+                                    maxHeight:
+                                      entry.image_rotation &&
+                                      entry.image_rotation % 180 === 90
+                                        ? "280px"
+                                        : "300px",
+                                  }}
+                                >
+                                  <img
+                                    src={entry.image_url}
+                                    alt="Story image"
+                                    className="w-full h-full object-contain transition-all duration-500"
+                                    loading="lazy"
+                                    style={{ background: "transparent" }}
+                                  />
+                                </div>
+                                {isAuthor && (
+                                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <button
+                                      onClick={() =>
+                                        handleRotateImage(entry.id)
+                                      }
+                                      className="bg-[#948363]/80 hover:bg-[#948363] text-white p-2 rounded-full shadow-lg transition-all duration-300"
+                                      title="Rotate image"
+                                    >
+                                      <RotateCw className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
-                          {/* Second Image */}
-                          {entry.image_url_2 &&
-                            renderImage(entry.image_url_2, entry.id, true)}
-
-                          <p className="text-[#2d1f0f] leading-relaxed whitespace-pre-line text-base sm:text-lg">
+                          <p className="text-[#2d1f0f] leading-relaxed whitespace-pre-line text-base sm:text-lg break-words">
                             {entry.content}
                           </p>
+                          {isAuthor && (
+                            <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-[#c9c1a7]/50">
+                              <button
+                                onClick={() => handleDeleteEntry(entry.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[#2d1f0f] hover:text-[#a39170] text-sm"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CardContent>
@@ -616,7 +474,7 @@ export default function Home() {
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
-          <div className="w-20 sm:w-32 h-1 bg-gradient-to-r from-[#948363] to-[#a39170] mx-auto mb-3 sm:mb-4"></div>
+          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-[#948363] to-[#a39170] mx-auto mb-3 sm:mb-4"></div>
           <p className="text-[#2d1f0f] font-medium text-sm sm:text-base px-4">
             Every story matters. Every moment counts.
           </p>
@@ -642,14 +500,14 @@ export default function Home() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                  className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] rounded-md transition-all duration-300 text-base"
+                  className="w-full p-3 border-2 border-[#c9c1a7] focus:border-[#a39170] bg-transparent text-[#2d1f0f] rounded-md transition-all duration-300"
                   placeholder="Enter password"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   onClick={handleLogin}
-                  className="flex-1 bg-[#948363] hover:bg-[#a39170] text-white transition-all duration-300 text-sm sm:text-base"
+                  className="flex-1 bg-[#948363] hover:bg-[#a39170] text-white transition-all duration-300"
                 >
                   Login
                 </Button>
@@ -659,7 +517,7 @@ export default function Home() {
                     setPassword("");
                   }}
                   variant="outline"
-                  className="flex-1 border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300 text-sm sm:text-base"
+                  className="flex-1 border-[#948363] text-[#948363] hover:bg-[#948363] hover:text-white transition-all duration-300"
                 >
                   Cancel
                 </Button>
@@ -712,14 +570,6 @@ export default function Home() {
 
         .drift-animation {
           animation: drift 8s ease-in-out infinite;
-        }
-
-        /* Mobile-specific optimizations */
-        @media (max-width: 640px) {
-          .container {
-            padding-left: 1rem;
-            padding-right: 1rem;
-          }
         }
       `}</style>
     </div>

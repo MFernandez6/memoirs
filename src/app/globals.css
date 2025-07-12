@@ -64,8 +64,8 @@ body {
   color: hsl(var(--foreground));
 }
 
-/* Mobile-specific optimizations */
-@media (max-width: 640px) {
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
   /* Improve touch targets */
   button,
   [role="button"] {
@@ -73,23 +73,22 @@ body {
     min-width: 44px;
   }
 
-  /* Prevent zoom on input focus */
-  input,
-  textarea,
-  select {
-    font-size: 16px;
+  /* Better text readability on mobile */
+  p,
+  span,
+  div {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent horizontal scrolling */
+  body {
+    overflow-x: hidden;
   }
 
   /* Improve scrolling performance */
-  * {
+  .overflow-y-auto {
     -webkit-overflow-scrolling: touch;
-  }
-
-  /* Optimize text rendering */
-  body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
 }
 
@@ -117,6 +116,20 @@ body {
   max-height: 400px !important;
 }
 
+/* Mobile-specific image rotation adjustments */
+@media (max-width: 768px) {
+  .rotated-image-container[style*="rotate(90deg)"],
+  .rotated-image-container[style*="rotate(270deg)"] {
+    max-width: 280px !important;
+    max-height: 240px !important;
+  }
+
+  .rotated-image-container[style*="rotate(180deg)"] {
+    max-width: 240px !important;
+    max-height: 280px !important;
+  }
+}
+
 /* Hover effects for rotation buttons */
 .rotation-button {
   backdrop-filter: blur(8px);
@@ -129,16 +142,20 @@ body {
   image-rendering: crisp-edges;
 }
 
-/* Mobile-specific image optimizations */
-@media (max-width: 640px) {
-  .rotated-image-container[style*="rotate(90deg)"],
-  .rotated-image-container[style*="rotate(270deg)"] {
-    max-width: 100% !important;
-    max-height: 300px !important;
+/* Mobile-specific touch improvements */
+@media (max-width: 768px) {
+  /* Larger touch targets for mobile */
+  .group:hover .opacity-0 {
+    opacity: 1 !important;
   }
 
-  .rotated-image-container[style*="rotate(180deg)"] {
-    max-width: 100% !important;
-    max-height: 300px !important;
+  /* Better button spacing on mobile */
+  .flex.gap-3 > * {
+    margin: 0 4px;
+  }
+
+  /* Improve modal positioning on mobile */
+  .fixed.inset-0 {
+    padding: 16px;
   }
 }
